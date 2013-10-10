@@ -1,6 +1,6 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.FieldStorage;
-using Orchard.Core.Common.Utilities;
+using Orchard.ContentManagement.Utilities;
 using Orchard.Environment.Extensions;
 
 namespace Contrib.ContentReference.Fields {

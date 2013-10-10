@@ -54,7 +54,7 @@ namespace Contrib.ContentReference.Handlers {
             // add handlers that will load content for id's just-in-time
             foreach (ContentReferenceField field in part.Fields.Where(f => f.FieldDefinition.Name.Equals("ContentReferenceField"))) {
                 var field1 = field;
-                field.ContentItemField.Loader(() => field1.ContentId.HasValue ? _contentManager.Get(field1.ContentId.Value) : null);   
+                field.ContentItemField.Loader(item => field1.ContentId.HasValue ? _contentManager.Get(field1.ContentId.Value) : null);   
             }
         }
 
