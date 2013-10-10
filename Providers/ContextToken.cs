@@ -1,7 +1,5 @@
-﻿using Contrib.ContentReference.Fields;
-using Orchard;
+﻿using Orchard;
 using Orchard.ContentManagement;
-using Orchard.Data;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Tokens;
