@@ -22,10 +22,15 @@ namespace Contrib.ContentReference.Settings {
             if (definition.FieldDefinition.Name == "ContentReferenceField") {
                 var model = definition.Settings.GetModel<ContentReferenceFieldSettings>();
                 model.QueryList = _contentManager.Query("Query").List()
-                    .Select(c => new SelectListItem {
-                        Text = _contentManager.GetItemMetadata(c).DisplayText,
-                        Value = c.Id.ToString(CultureInfo.InvariantCulture),
-                        Selected = c.Id == model.QueryId
+                    .Select(c => {
+                        var contentItemMetadata = _contentManager.GetItemMetadata(c);
+                        var contentItemIdentity = contentItemMetadata.Identity.ToString();
+
+                        return new SelectListItem {
+                            Text = contentItemMetadata.DisplayText,
+                            Value = contentItemIdentity,
+                            Selected = contentItemIdentity == model.QueryIdentifier
+                        };
                     }).ToList();
                 yield return DefinitionTemplate(model);
             }
@@ -38,7 +43,7 @@ namespace Contrib.ContentReference.Settings {
 
             var model = new ContentReferenceFieldSettings();
             if (updateModel.TryUpdateModel(model, "ContentReferenceFieldSettings", null, null)) {
-                builder.WithSetting("ContentReferenceFieldSettings.QueryId", model.QueryId.ToString(CultureInfo.InvariantCulture));
+                builder.WithSetting("ContentReferenceFieldSettings.QueryIdentifier", model.QueryIdentifier.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.DisplayAsLink", model.DisplayAsLink.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.Required", model.Required.ToString(CultureInfo.InvariantCulture));
             }

@@ -34,7 +34,7 @@ namespace Contrib.ContentReference.Handlers {
 
         protected override void Activated(ActivatedContentContext context) {
             foreach(var part in context.ContentItem.Parts) {
-                PropertySetHandlers(context, part);
+                PropertySetHandlers(context, part, _contentManager);
             }
         }
 
@@ -54,19 +54,19 @@ namespace Contrib.ContentReference.Handlers {
             // add handlers that will load content for id's just-in-time
             foreach (ContentReferenceField field in part.Fields.Where(f => f.FieldDefinition.Name.Equals("ContentReferenceField"))) {
                 var field1 = field;
-                field.ContentItemField.Loader(item => field1.ContentId.HasValue ? _contentManager.Get(field1.ContentId.Value) : null);   
+                field.ContentItemField.Loader(item => field1.Identifier != null ? _contentManager.ResolveIdentity(new ContentIdentity(field.Identifier)) : null);   
             }
         }
 
-        protected static void PropertySetHandlers(ActivatedContentContext context, ContentPart part) {
+        protected static void PropertySetHandlers(ActivatedContentContext context, ContentPart part, IContentManager contentManager) {
             // add handlers that will update ID when ContentItem is assigned
             foreach (ContentReferenceField field in part.Fields.Where(f => f.FieldDefinition.Name.Equals("ContentReferenceField"))) {
                 var field1 = field;
                 field1.ContentItemField.Setter(contentItem => {
-                    field1.ContentId = 
+                    field1.Identifier = 
                         contentItem == null
-                            ? new int?()
-                            : contentItem.Id;
+                            ? null
+                            : contentManager.GetItemMetadata(contentItem).Identity.ToString();
                     return contentItem;
                 });
 

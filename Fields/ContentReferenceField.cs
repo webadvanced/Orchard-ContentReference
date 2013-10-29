@@ -10,8 +10,8 @@ namespace Contrib.ContentReference.Fields {
 
         public LazyField<IContent> ContentItemField { get { return _contentItem; } }
 
-        public int? ContentId { 
-            get { return Storage.Get<int?>(); }
+        public string Identifier { 
+            get { return Storage.Get<string>(); }
             set { Storage.Set(value); }
         }
 
