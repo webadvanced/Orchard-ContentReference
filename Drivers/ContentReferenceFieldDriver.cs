@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
@@ -63,15 +64,17 @@ namespace Contrib.ContentReference.Drivers
         protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, dynamic shapeHelper)
         {
             var settings = field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
-            var query = _contentManager.ResolveIdentity(new ContentIdentity(settings.QueryIdentifier));
-            var contentItems = _projectionManager.GetContentItems(query.Id)
-                .Select(c => new SelectListItem
-                {
-                    Text = Services.ContentManager.GetItemMetadata(c).DisplayText,
-                    Value = c.Id.ToString(),
-                    Selected = field.ContentIds.Contains(c.Id)
-                })
-                .ToList();
+            
+            List<SelectListItem> contentItems = settings.QueryId == null
+                                    ? new List<SelectListItem>()
+                                    : _projectionManager.GetContentItems(settings.QueryId.Value)
+                                                        .Select(c => new SelectListItem
+                                                            {
+                                                                Text = Services.ContentManager.GetItemMetadata(c).DisplayText,
+                                                                Value = c.Id.ToString(),
+                                                                Selected = field.ContentIds.Contains(c.Id)
+                                                            })
+                                                        .ToList();
 
             contentItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
 
