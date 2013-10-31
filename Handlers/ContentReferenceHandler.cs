@@ -54,7 +54,7 @@ namespace Contrib.ContentReference.Handlers {
             // add handlers that will load content for id's just-in-time
             foreach (ContentReferenceField field in part.Fields.Where(f => f.FieldDefinition.Name.Equals("ContentReferenceField"))) {
                 var field1 = field;
-                field.ContentItemField.Loader(item => field1.Identifier != null ? _contentManager.ResolveIdentity(new ContentIdentity(field.Identifier)) : null);   
+                field.ContentItemField.Loader(item => field1.ContentIds.Select(i => _contentManager.Get(i)));   
             }
         }
 
@@ -62,12 +62,10 @@ namespace Contrib.ContentReference.Handlers {
             // add handlers that will update ID when ContentItem is assigned
             foreach (ContentReferenceField field in part.Fields.Where(f => f.FieldDefinition.Name.Equals("ContentReferenceField"))) {
                 var field1 = field;
-                field1.ContentItemField.Setter(contentItem => {
-                    field1.Identifier = 
-                        contentItem == null
-                            ? null
-                            : contentManager.GetItemMetadata(contentItem).Identity.ToString();
-                    return contentItem;
+                field1.ContentItemField.Setter(contentItems => {
+                    var contentItemsArray = contentItems.ToArray();
+                    field1.ContentIds = contentItemsArray.Select(content => content.Id).ToArray();
+                    return contentItemsArray;
                 });
 
                 // Force call to setter if we had already set a value

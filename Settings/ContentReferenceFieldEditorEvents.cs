@@ -46,6 +46,7 @@ namespace Contrib.ContentReference.Settings {
                 builder.WithSetting("ContentReferenceFieldSettings.QueryIdentifier", model.QueryIdentifier.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.DisplayAsLink", model.DisplayAsLink.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.Required", model.Required.ToString(CultureInfo.InvariantCulture));
+                builder.WithSetting("ContentReferenceFieldSettings.Multiple", model.Multiple.ToString(CultureInfo.InvariantCulture));
             }
 
             yield return DefinitionTemplate(model);

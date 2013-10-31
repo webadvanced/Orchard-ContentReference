@@ -25,12 +25,24 @@ namespace Contrib.ContentReference.Providers {
 
         public void Describe(DescribeContext context) {
             context.For("ContentReferenceField", T("Content Reference Field"), T("Tokens for Content Reference Fields"))
-                .Token("ContentItem", T("Content Item"), T("The content item referenced."));
+                   .Token("ContentItems", T("Content Items"), T("The content items referenced."))
+                   .Token("ContentItems[:*]", T("Content Items"), T("A content items referenced by its index. Can be chained with Content tokens."));
         }
 
         public void Evaluate(EvaluateContext context) {
             context.For<ContentReferenceField>("ContentReferenceField")
-                .Chain("ContentItem", "Content", field => field.ContentItem);
+                .Token(
+                       token => token.StartsWith("ContentItems:", StringComparison.OrdinalIgnoreCase) ? token.Substring("ContentItems:".Length) : null,
+                       (token, t) =>
+                       {
+                           var index = Convert.ToInt32(token);
+                           return index + 1 > t.ContentIds.Count() ? null : t.ContentItems.ElementAt(index);
+                       })
+                .Chain("ContentItems", "Content", field => field.ContentItems)
+                .Chain("ContentItems:0", "Content", t => t.ContentItems.ElementAt(0))
+                .Chain("ContentItems:1", "Content", t => t.ContentItems.ElementAt(1))
+                .Chain("ContentItems:2", "Content", t => t.ContentItems.ElementAt(2))
+                .Chain("ContentItems:3", "Content", t => t.ContentItems.ElementAt(3));
         }
     }
 }

@@ -11,6 +11,12 @@
 </fieldset>
 <fieldset>
     <div>
+        @Html.CheckBoxFor(m => m.Multiple) <label for="@Html.FieldIdFor(m => m.Multiple)" class="forcheckbox">@T("Allow multiple content items")</label>
+        <span class="hint">@T("Check to allow the user to select multiple content items.")</span>
+    </div>
+</fieldset>
+<fieldset>
+    <div>
         @Html.CheckBoxFor(m => m.DisplayAsLink) <label for="@Html.FieldIdFor(m => m.DisplayAsLink)" class="forcheckbox">@T("Display as link")</label>
         <span class="hint">@T("Check to make the item text link to the item.")</span>
     </div>
