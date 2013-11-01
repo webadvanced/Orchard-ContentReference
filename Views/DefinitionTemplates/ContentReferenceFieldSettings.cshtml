@@ -1,13 +1,19 @@
 ﻿@model Contrib.ContentReference.Settings.ContentReferenceFieldSettings
 @using Contrib.ContentReference.Settings
 <fieldset>
-    <label class="forpicker" for="@Html.FieldIdFor(m => m.QueryId)">@T("Query for selectable content")</label>    
-    <select id="@Html.FieldIdFor(m => m.QueryId)" name="@Html.FieldNameFor(m => m.QueryId)">
+    <label class="forpicker" for="@Html.FieldIdFor(m => m.QueryIdentifier)">@T("Query for selectable content")</label>    
+    <select id="@Html.FieldIdFor(m => m.QueryIdentifier)" name="@Html.FieldNameFor(m => m.QueryIdentifier)">
         @foreach(var item in Model.QueryList) {
             @Html.SelectOption(item.Value, item.Selected, item.Text)
         }
     </select> 
     <span class="hint">@T("This query determines what content items are selectable by the user.")</span>
+</fieldset>
+<fieldset>
+    <div>
+        @Html.CheckBoxFor(m => m.Multiple) <label for="@Html.FieldIdFor(m => m.Multiple)" class="forcheckbox">@T("Allow multiple content items")</label>
+        <span class="hint">@T("Check to allow the user to select multiple content items.")</span>
+    </div>
 </fieldset>
 <fieldset>
     <div>
