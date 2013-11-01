@@ -24,11 +24,12 @@ namespace Contrib.ContentReference.Settings {
                 model.QueryList = _contentManager.Query("Query").List()
                     .Select(c => {
                         var contentItemMetadata = _contentManager.GetItemMetadata(c);
+                        var contentItemIdentity = contentItemMetadata.Identity.ToString();
 
                         return new SelectListItem {
                             Text = contentItemMetadata.DisplayText,
-                            Value = c.Id.ToString(),
-                            Selected = c.Id == model.QueryId
+                            Value = contentItemIdentity,
+                            Selected = contentItemIdentity == model.QueryIdentifier
                         };
                     }).ToList();
                 yield return DefinitionTemplate(model);
@@ -42,12 +43,7 @@ namespace Contrib.ContentReference.Settings {
 
             var model = new ContentReferenceFieldSettings();
             if (updateModel.TryUpdateModel(model, "ContentReferenceFieldSettings", null, null)) {
-                if (model.QueryId != null)
-                {
-                    var queryIdentifier = _contentManager.GetItemMetadata(_contentManager.Get(model.QueryId.Value)).Identity.ToString();
-                    builder.WithSetting("ContentReferenceFieldSettings.QueryIdentifier", queryIdentifier);
-                }
-
+                builder.WithSetting("ContentReferenceFieldSettings.QueryIdentifier", model.QueryIdentifier);
                 builder.WithSetting("ContentReferenceFieldSettings.DisplayAsLink", model.DisplayAsLink.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.Required", model.Required.ToString(CultureInfo.InvariantCulture));
                 builder.WithSetting("ContentReferenceFieldSettings.Multiple", model.Multiple.ToString(CultureInfo.InvariantCulture));

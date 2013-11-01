@@ -64,10 +64,12 @@ namespace Contrib.ContentReference.Drivers
         protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, dynamic shapeHelper)
         {
             var settings = field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
-            
-            List<SelectListItem> contentItems = settings.QueryId == null
+
+            var query = _contentManager.ResolveIdentity(new ContentIdentity(settings.QueryIdentifier));
+
+            List<SelectListItem> selectionList = (query == null)
                                     ? new List<SelectListItem>()
-                                    : _projectionManager.GetContentItems(settings.QueryId.Value)
+                                    : _projectionManager.GetContentItems(query.Id)
                                                         .Select(c => new SelectListItem
                                                             {
                                                                 Text = Services.ContentManager.GetItemMetadata(c).DisplayText,
@@ -76,14 +78,14 @@ namespace Contrib.ContentReference.Drivers
                                                             })
                                                         .ToList();
 
-            contentItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            selectionList.Insert(0, new SelectListItem { Text = "None", Value = "" });
 
             var model = new ContentReferenceFieldViewModel
             {
                 Field = field,
                 SelectedContentIds = field.ContentIds,
                 SelectedContentId = field.ContentIds.FirstOrDefault(),
-                SelectionList = contentItems
+                SelectionList = selectionList
             };
 
             return ContentShape("Fields_ContentReference_Edit", GetDifferentiator(field, part),
