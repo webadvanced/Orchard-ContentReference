@@ -4,6 +4,14 @@
     var settings = Model.Field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
 }
 <fieldset>
-    <label for="@Html.FieldIdFor(m => m.ContentId)">@Model.Field.DisplayName</label>
-    @Html.DropDownListFor(m => m.ContentId, Model.ItemList)
+    @if (settings.Multiple)
+    {
+        <label for="@Html.FieldIdFor(m => m.SelectedContentIds)">@Model.Field.DisplayName</label>
+        @Html.ListBoxFor(model => model.SelectedContentIds, new MultiSelectList(Model.SelectionList, "Value", "Text"))
+    }
+    else
+    {
+        <label for="@Html.FieldIdFor(m => m.SelectedContentId)">@Model.Field.DisplayName</label>
+        @Html.DropDownListFor(model => model.SelectedContentId, new SelectList(Model.SelectionList, "Value", "Text"))
+    }
 </fieldset>
