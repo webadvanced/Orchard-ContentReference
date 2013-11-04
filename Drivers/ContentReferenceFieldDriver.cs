@@ -13,11 +13,9 @@ using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Projections.Services;
 
-namespace Contrib.ContentReference.Drivers
-{
+namespace Contrib.ContentReference.Drivers {
     [OrchardFeature("Contrib.ContentReference")]
-    public class ContentReferenceFieldDriver : ContentFieldDriver<Fields.ContentReferenceField>
-    {
+    public class ContentReferenceFieldDriver : ContentFieldDriver<Fields.ContentReferenceField> {
         private readonly IProjectionManager _projectionManager;
         private readonly IContentManager _contentManager;
         public IOrchardServices Services { get; set; }
@@ -27,8 +25,7 @@ namespace Contrib.ContentReference.Drivers
             IOrchardServices services,
             IProjectionManager projectionManager,
             IContentManager contentManager
-            )
-        {
+            ) {
             _projectionManager = projectionManager;
             _contentManager = contentManager;
             Services = services;
@@ -37,51 +34,45 @@ namespace Contrib.ContentReference.Drivers
 
         public Localizer T { get; set; }
 
-        private static string GetPrefix(ContentField field, ContentPart part)
-        {
+        private static string GetPrefix(ContentField field, ContentPart part) {
             return part.PartDefinition.Name + "." + field.Name;
         }
 
-        private static string GetDifferentiator(Fields.ContentReferenceField field, ContentPart part)
-        {
+        private static string GetDifferentiator(Fields.ContentReferenceField field, ContentPart part) {
             return field.Name;
         }
 
-        protected override DriverResult Display(ContentPart part, Fields.ContentReferenceField field, string displayType, dynamic shapeHelper)
-        {
+        protected override DriverResult Display(ContentPart part, Fields.ContentReferenceField field, string displayType, dynamic shapeHelper) {
             var settings = field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
 
             var contentItems =
                 field.ContentItems
-                .Select(content => 
-                    new Tuple<string, IContent>(Services.ContentManager.GetItemMetadata(content).DisplayText, content))
-                .ToArray();
+                     .Select(content =>
+                             new Tuple<string, IContent>(Services.ContentManager.GetItemMetadata(content).DisplayText, content))
+                     .ToArray();
 
             return ContentShape("Fields_ContentReference", GetDifferentiator(field, part),
-                () => shapeHelper.Fields_ContentReference(DisplayAsLink: settings.DisplayAsLink, ContentField: field, ContentItems: contentItems));
+                                () => shapeHelper.Fields_ContentReference(DisplayAsLink: settings.DisplayAsLink, ContentField: field, ContentItems: contentItems));
         }
 
-        protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, dynamic shapeHelper)
-        {
+        protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, dynamic shapeHelper) {
             var settings = field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
 
             var query = _contentManager.ResolveIdentity(new ContentIdentity(settings.QueryIdentifier));
 
             List<SelectListItem> selectionList = (query == null)
-                                    ? new List<SelectListItem>()
-                                    : _projectionManager.GetContentItems(query.Id)
-                                                        .Select(c => new SelectListItem
-                                                            {
-                                                                Text = Services.ContentManager.GetItemMetadata(c).DisplayText,
-                                                                Value = c.Id.ToString(),
-                                                                Selected = field.ContentIds.Contains(c.Id)
-                                                            })
-                                                        .ToList();
+                                                     ? new List<SelectListItem>()
+                                                     : _projectionManager.GetContentItems(query.Id)
+                                                                         .Select(c => new SelectListItem {
+                                                                             Text = Services.ContentManager.GetItemMetadata(c).DisplayText,
+                                                                             Value = c.Id.ToString(),
+                                                                             Selected = field.ContentIds.Contains(c.Id)
+                                                                         })
+                                                                         .ToList();
 
-            selectionList.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            selectionList.Insert(0, new SelectListItem {Text = "None", Value = ""});
 
-            var model = new ContentReferenceFieldViewModel
-            {
+            var model = new ContentReferenceFieldViewModel {
                 Field = field,
                 SelectedContentIds = field.ContentIds,
                 SelectedContentId = field.ContentIds.FirstOrDefault(),
@@ -89,30 +80,25 @@ namespace Contrib.ContentReference.Drivers
             };
 
             return ContentShape("Fields_ContentReference_Edit", GetDifferentiator(field, part),
-                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: model, Prefix: GetPrefix(field, part)));
+                                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: model, Prefix: GetPrefix(field, part)));
         }
 
-        protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, IUpdateModel updater, dynamic shapeHelper)
-        {
+        protected override DriverResult Editor(ContentPart part, Fields.ContentReferenceField field, IUpdateModel updater, dynamic shapeHelper) {
             var viewModel = new ContentReferenceFieldViewModel();
 
-            if (updater.TryUpdateModel(viewModel, GetPrefix(field, part), null, null))
-            {
+            if (updater.TryUpdateModel(viewModel, GetPrefix(field, part), null, null)) {
                 var settings = field.PartFieldDefinition.Settings.GetModel<ContentReferenceFieldSettings>();
 
-                if (viewModel.SelectedContentIds == null || !viewModel.SelectedContentIds.Any())
-                {
+                if (viewModel.SelectedContentIds == null || !viewModel.SelectedContentIds.Any()) {
                     field.ContentIds = viewModel.SelectedContentId.HasValue
-                        ? new[] { viewModel.SelectedContentId.Value }
-                        : new int[0];
+                                           ? new[] {viewModel.SelectedContentId.Value}
+                                           : new int[0];
                 }
-                else
-                {
+                else {
                     field.ContentIds = viewModel.SelectedContentIds;
                 }
 
-                if (settings.Required && field.ContentIds.Length == 0)
-                {
+                if (settings.Required && field.ContentIds.Length == 0) {
                     updater.AddModelError("Id", T("The field {0} is mandatory", field.DisplayName));
                 }
             }
@@ -122,21 +108,19 @@ namespace Contrib.ContentReference.Drivers
 
         protected override void Importing(ContentPart part, Fields.ContentReferenceField field, ImportContentContext context) {
             context.ImportAttribute(field.FieldDefinition.Name + "." + field.Name, "Identifier", identity => {
-                field.ContentIds = 
-                    identity.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(s => _contentManager.ResolveIdentity(new ContentIdentity(s)).Id).ToArray();
+                field.ContentIds =
+                    identity.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => _contentManager.ResolveIdentity(new ContentIdentity(s)).Id).ToArray();
             });
         }
 
-        protected override void Exporting(ContentPart part, Fields.ContentReferenceField field, ExportContentContext context)
-        {
+        protected override void Exporting(ContentPart part, Fields.ContentReferenceField field, ExportContentContext context) {
             context.Element(field.FieldDefinition.Name + "." + field.Name)
-                .SetAttributeValue("Identifier", string.Join(",", field.ContentIds.Select(i => _contentManager.GetItemMetadata(_contentManager.Get(i)).Identity)));
+                   .SetAttributeValue("Identifier", string.Join(",", field.ContentIds.Select(i => _contentManager.GetItemMetadata(_contentManager.Get(i)).Identity)));
         }
 
-        protected override void Describe(DescribeMembersContext context)
-        {
-            context.Member(null, typeof(string), T("ContentIds"), T("The Content Ids referenced by this field."));
+        protected override void Describe(DescribeMembersContext context) {
+            context.Member(null, typeof (string), T("ContentIds"), T("The Content Ids referenced by this field."));
         }
     }
 }

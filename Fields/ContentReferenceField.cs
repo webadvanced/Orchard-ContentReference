@@ -9,10 +9,12 @@ using Orchard.Environment.Extensions;
 namespace Contrib.ContentReference.Fields {
     [OrchardFeature("Contrib.ContentReference")]
     public class ContentReferenceField : ContentField {
-        private static readonly char[] separator = new[] { '{', '}', ',' };
+        private static readonly char[] separator = new[] {'{', '}', ','};
         private readonly LazyField<IEnumerable<IContent>> _contentItems = new LazyField<IEnumerable<IContent>>();
 
-        public LazyField<IEnumerable<IContent>> ContentItemField { get { return _contentItems; } }
+        public LazyField<IEnumerable<IContent>> ContentItemField {
+            get { return _contentItems; }
+        }
 
         public int[] ContentIds {
             get { return DecodeIds(Storage.Get<string>()); }
@@ -23,10 +25,8 @@ namespace Contrib.ContentReference.Fields {
             get { return _contentItems.Value; }
         }
 
-        private string EncodeIds(ICollection<int> ids)
-        {
-            if (ids == null || !ids.Any())
-            {
+        private string EncodeIds(ICollection<int> ids) {
+            if (ids == null || !ids.Any()) {
                 return string.Empty;
             }
 
@@ -34,10 +34,8 @@ namespace Contrib.ContentReference.Fields {
             return "{" + string.Join("},{", ids.ToArray()) + "}";
         }
 
-        private int[] DecodeIds(string ids)
-        {
-            if (String.IsNullOrWhiteSpace(ids))
-            {
+        private int[] DecodeIds(string ids) {
+            if (String.IsNullOrWhiteSpace(ids)) {
                 return new int[0];
             }
 
