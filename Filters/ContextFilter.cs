@@ -18,9 +18,11 @@ namespace Contrib.ContentReference.Filters {
 
         public void OnActionExecuting(ActionExecutingContext filterContext) {
             var area = (string)filterContext.RouteData.Values["area"];
-
+            if(area == null)
+                return;
+            
             ContentItem item = null;
-
+            
             if (area.Equals("Contents", StringComparison.OrdinalIgnoreCase) && !String.IsNullOrEmpty((string)filterContext.RouteData.Values["Id"])) {
                 int cid;
                 if (int.TryParse((string) filterContext.RouteData.Values["Id"], out cid)) {
